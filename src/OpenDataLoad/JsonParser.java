@@ -18,76 +18,71 @@ import java.util.Iterator;
 
 public class JsonParser {
 	
-	JSONParser parser;
-	
-	public JsonParser() {
+	// container for position: (longitude, latitude)
+	class Position  {
 		
+		private double longitude;
+		private double latitude;
+		
+		public Position(double longitude, double latitude) {
+			this.longitude = longitude;
+			this.latitude = latitude;
+		}
+		
+		public double getLongitude() {
+			return longitude;
+		}
+		
+		public double getLatitude() {
+			return latitude;
+		}
+	}
+	
+	// json parser
+	private JSONParser parser;
+
+	// max number of entries
+	private int	maxEntries;
+	
+	// position array
+	private Position[] position;
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param maxEntries number of entries in data
+	 */
+	public JsonParser(int maxEntries) {
+		
+		this.maxEntries = maxEntries;
 		parser = new JSONParser();
+		position = new Position[maxEntries];
 	}
 	
 	/**
+	 * Parses data for tree input.
 	 * 
-	 * @param str
+	 * @param str source data with tree positions and names
 	 */
-	public void parseThisShit(String str) {
+	public void parseTrees(String str, int maxEntries) {
 		
 		try {
 
-			Object obj = parser.parse(str);
+			JSONObject jsonObject = (JSONObject) parser.parse(str);
 
-			JSONObject jsonObject = (JSONObject) obj;
-			System.out.println(jsonObject);
-
-			String name = (String) jsonObject.get("latitude");
-			System.out.println(name);
-
-//			long age = (Long) jsonObject.get("age");
-//			System.out.println(age);
-
-			// loop array
-			JSONArray msg = (JSONArray) jsonObject.get("latitude");
-			Iterator<String> iterator = msg.iterator();
+			// parse
+			JSONObject result = (JSONObject) jsonObject.get("result");
+			JSONArray records = (JSONArray) result.get("records");			
+			Iterator<JSONObject> iterator = records.iterator();
+			int i = 0;
 			while (iterator.hasNext()) {
-				System.out.println(iterator.next());
+				i++;
+				JSONObject name1 = iterator.next();
+				System.out.println("" + i + ": " + name1.get("longitude") + ", " + name1.get("latitude"));
 			}
 
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 	}
-
-	public static void main(String[] args) {
-
-		JSONParser parser = new JSONParser();
-
-		try {
-
-			Object obj = parser.parse(new FileReader("f:\\test.json"));
-
-			JSONObject jsonObject = (JSONObject) obj;
-			System.out.println(jsonObject);
-
-			String name = (String) jsonObject.get("latitude");
-			System.out.println(name);
-
-//			long age = (Long) jsonObject.get("age");
-//			System.out.println(age);
-
-			// loop array
-			JSONArray msg = (JSONArray) jsonObject.get("latitude");
-			Iterator<String> iterator = msg.iterator();
-			while (iterator.hasNext()) {
-				System.out.println(iterator.next());
-			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 }
