@@ -1,88 +1,59 @@
 package OpenDataLoad;
 
 
+import java.io.FileReader;
+
 //<dependency>
 //<groupId>com.googlecode.json-simple</groupId>
 //<artifactId>json-simple</artifactId>
 //<version>1.1.1</version>
 //</dependency>
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Iterator;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class JsonParser {
 	
-	// container for position: (longitude, latitude)
-	class Position  {
-		
-		private double longitude;
-		private double latitude;
-		
-		public Position(double longitude, double latitude) {
-			this.longitude = longitude;
-			this.latitude = latitude;
-		}
-		
-		public double getLongitude() {
-			return longitude;
-		}
-		
-		public double getLatitude() {
-			return latitude;
-		}
-	}
-	
-	// json parser
-	private JSONParser parser;
-
-	// max number of entries
-	private int	maxEntries;
-	
-	// position array
-	private Position[] position;
-	
-	/**
-	 * Constructor.
-	 * 
-	 * @param maxEntries number of entries in data
-	 */
-	public JsonParser(int maxEntries) {
-		
-		this.maxEntries = maxEntries;
-		parser = new JSONParser();
-		position = new Position[maxEntries];
+	public JsonParser() {
 	}
 	
 	/**
-	 * Parses data for tree input.
 	 * 
-	 * @param str source data with tree positions and names
+	 * @param str
 	 */
-	public void parseTrees(String str, int maxEntries) {
-		
-		try {
+	public void parseThisShit(String str)  throws Exception  {
+			JSONObject jsonObject = new JSONObject(str);
+			System.out.println(jsonObject);
 
-			JSONObject jsonObject = (JSONObject) parser.parse(str);
+			String name = (String) jsonObject.get("latitude");
+			System.out.println(name);
 
-			// parse
-			JSONObject result = (JSONObject) jsonObject.get("result");
-			JSONArray records = (JSONArray) result.get("records");			
-			Iterator<JSONObject> iterator = records.iterator();
-			int i = 0;
-			while (iterator.hasNext()) {
-				i++;
-				JSONObject name1 = iterator.next();
-				System.out.println("" + i + ": " + name1.get("longitude") + ", " + name1.get("latitude"));
+//			long age = (Long) jsonObject.get("age");
+//			System.out.println(age);
+
+			// loop array
+			JSONArray msg = (JSONArray) jsonObject.get("latitude");
+			for(int i=0;i<msg.length();i++){
+				System.out.println(msg.get(i));
+			}
+	}
+
+	public static void main(String[] args) throws Exception {
+
+			JSONObject jsonObject = new JSONObject(new FileReader("f:\\test.json"));
+			System.out.println(jsonObject);
+
+			String name = (String) jsonObject.get("latitude");
+			System.out.println(name);
+
+//			long age = (Long) jsonObject.get("age");
+//			System.out.println(age);
+
+			// loop array
+			JSONArray msg = (JSONArray) jsonObject.get("latitude");
+			for(int i=0;i<msg.length();i++){
+				System.out.println(msg.get(i));
 			}
 
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
 	}
+
 }
