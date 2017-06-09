@@ -1,41 +1,27 @@
 package OpenDataLoad;
 
 
+import java.io.FileReader;
+
 //<dependency>
 //<groupId>com.googlecode.json-simple</groupId>
 //<artifactId>json-simple</artifactId>
 //<version>1.1.1</version>
 //</dependency>
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Iterator;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class JsonParser {
 	
-	JSONParser parser;
-	
 	public JsonParser() {
-		
-		parser = new JSONParser();
 	}
 	
 	/**
 	 * 
 	 * @param str
 	 */
-	public void parseThisShit(String str) {
-		
-		try {
-
-			Object obj = parser.parse(str);
-
-			JSONObject jsonObject = (JSONObject) obj;
+	public void parseThisShit(String str)  throws Exception  {
+			JSONObject jsonObject = new JSONObject(str);
 			System.out.println(jsonObject);
 
 			String name = (String) jsonObject.get("latitude");
@@ -46,25 +32,14 @@ public class JsonParser {
 
 			// loop array
 			JSONArray msg = (JSONArray) jsonObject.get("latitude");
-			Iterator<String> iterator = msg.iterator();
-			while (iterator.hasNext()) {
-				System.out.println(iterator.next());
+			for(int i=0;i<msg.length();i++){
+				System.out.println(msg.get(i));
 			}
-
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
-		JSONParser parser = new JSONParser();
-
-		try {
-
-			Object obj = parser.parse(new FileReader("f:\\test.json"));
-
-			JSONObject jsonObject = (JSONObject) obj;
+			JSONObject jsonObject = new JSONObject(new FileReader("f:\\test.json"));
 			System.out.println(jsonObject);
 
 			String name = (String) jsonObject.get("latitude");
@@ -75,18 +50,9 @@ public class JsonParser {
 
 			// loop array
 			JSONArray msg = (JSONArray) jsonObject.get("latitude");
-			Iterator<String> iterator = msg.iterator();
-			while (iterator.hasNext()) {
-				System.out.println(iterator.next());
+			for(int i=0;i<msg.length();i++){
+				System.out.println(msg.get(i));
 			}
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
 
 	}
 
