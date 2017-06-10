@@ -91,7 +91,15 @@
 			}
 			
 			function addMarkers(e){
-				var marker = L.marker(e.latlng,{"draggable":true}).addTo(mymap);
+				var marker = L.marker(e.latlng,{"draggable":true,
+						contextmenu: true,
+						contextmenuItems: [{
+							text: 'DeleteMarker',
+							callback: deleteMarker,
+							index: 1
+						}]
+						});
+				marker.addTo(mymap);
 				var editField="<textarea id='newMarker'></textarea>";
 				var newPop=marker.bindPopup(editField).openPopup();
 				//TODO set focus to textarea
@@ -104,8 +112,18 @@
 					    "description":marker.description
 					},function(data){
 					    //TODO was tun im fehlerfall if(data==null || data=="" || data==-1)
+						//Set user Data at marker
 						marker.serverId=data;
 						marker.bindPopup(marker.description);
+						//add dragDrop Handler
+						marker.on("moveend",function(event){
+						var marker=event.target;
+						sendMarkers({"id":marker.serverId,
+									   "lat": marker.getLatLng().lat,
+									   "lon": marker.getLatLng().lng,
+									   "description":marker.getPopup().getContent()}
+									 );
+						});
 					});
 				});
 			}
@@ -113,7 +131,7 @@
 			function deleteMarker(e){
 				deleteMarkerFromServer(e.relatedTarget.serverId,
 				function(result){
-					if(result=="ok"){
+					if(result.responseText=="ok"){
 						e.relatedTarget.remove();	
 					}else{
 						console.log(result);
@@ -129,7 +147,7 @@
 								dataType: "json",
 								crossDomain: true }
 							  );
-				re1.done(onSuccess),
+				re1.done(onSuccess);
 				//onError
 				re1.fail(function(data){
 					console.log(data);
@@ -137,16 +155,16 @@
 			}
 			
 			function deleteMarkerFromServer(serverID, onSuccess){
-				var url="http://"+getLocation(window.location.href).hostname+":8080/markers";
-				var re1=$.ajax({url: url,
-								type: 'delete',
-							    data:{"id":serverID},
+				var url="http://"+getLocation(window.location.href).hostname+":8080/markers/delete";
+				var re1=$.post({url: url,
+							    data:"{id:"+serverID+"}",
 								dataType: "json",
 								crossDomain: true }
 							  );
-				re1.done(onSuccess),
+				re1.done(onSuccess);
 				//onError
 				re1.fail(function(data){
+					onSuccess(data);
 					console.log(data);
 				});
 			}
