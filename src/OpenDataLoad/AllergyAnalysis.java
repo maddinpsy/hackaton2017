@@ -4,11 +4,12 @@ import java.util.ArrayList;
 
 public class AllergyAnalysis {
 
-	private static final double WEIGHTCUTOFF = 300.0; 
+	private static final double NORMALIZEDMAX = 30.0;
+	private static final double WEIGHTCUTOFF = 1000.0;
 	private static final double WEIGHTFACTOR = 1.0;
 	private static final double D_DISTANCE_LA = 111194.92664455873; // approx distance in meter per degree
 	private static final double D_DISTANCE_LO = 65358.19505379952; // approx distance in meter per degree
-	private static final double MAXDISTANCEMETERS = 300.0;	// max weighted distance of tree [meters]
+	private static final double MAXDISTANCEMETERS = 110.0;	// max weighted distance of tree [meters]
 	private static final double HALFDISTANCEMETERS = MAXDISTANCEMETERS/4; // half weight distance [meters]
 	// expconst = ln(A_0/A(x))/x
 	private static final double EXPCONST = Math.log(2)/HALFDISTANCEMETERS;
@@ -152,6 +153,9 @@ public class AllergyAnalysis {
 			}
 		}
 		
+		// normalize values to 0.0...1.0
+		result = normalizer(result);
+		
 		// check min and max in data
 		double[] miMa = minMax(result);
 		System.out.println("min: " + miMa[0]);
@@ -203,8 +207,8 @@ public class AllergyAnalysis {
 		// A(x) = A_0 * Math.pow(Math.E, (-EXPCONST*x))
 
 //		return (distance<MAXDISTANCEMETERS) ? WEIGHTFACTOR : 0.0;
-//		return (distance<MAXDISTANCEMETERS) ? (MAXDISTANCEMETERS-distance)/MAXDISTANCEMETERS : 0.0;
-		return (distance<MAXDISTANCEMETERS) ? WEIGHTFACTOR*Math.pow(Math.E, (-EXPCONST*distance)) : 0.0;
+		return (distance<MAXDISTANCEMETERS) ? (MAXDISTANCEMETERS-distance)/MAXDISTANCEMETERS : 0.0;
+//		return (distance<MAXDISTANCEMETERS) ? WEIGHTFACTOR*Math.pow(Math.E, (-EXPCONST*distance)) : 0.0;
 	}
 
 	// calc mask if too slow?
@@ -272,6 +276,26 @@ public class AllergyAnalysis {
 
 		return miMa;
 	}
+	
+	/**
+	 * Normalizes data ranges to 0.0...1.0
+	 * 
+	 * @param aaData matrix
+	 * @return aaData normalized
+	 */
+	public static double[][] normalizer(double[][] aaData) {
+		
+		double[] miMa = minMax(aaData);
+		double maxNorm = miMa[1]-miMa[0];
+		
+		for (int i = 0; i < aaData.length; i++) {
+			for (int j = 0; j < aaData[0].length; j++) {
+				aaData[i][j] = NORMALIZEDMAX*(Math.abs(aaData[i][j] - miMa[0]) / maxNorm);
+			}
+		}
+		
+		return aaData;
+	}
 
 	public static void main(String[] args) {
 
@@ -282,8 +306,8 @@ public class AllergyAnalysis {
 		double Lo0 = 12.0017;
 		double La1 = 54.1861;
 		double Lo1 = 12.2222;
-		int nLa = 20;
-		int nLo = 20;
+		int nLa = 500;
+		int nLo = 500;
 
 		// calc distance for testing
 		double metersLa = aa.calcDistanceInMeters(54, 12, 55, 12);
@@ -291,11 +315,17 @@ public class AllergyAnalysis {
 		double metersLo = aa.calcDistanceInMeters(54, 12, 54, 13);
 		System.out.println("metersLo: " + metersLo);
 
-		int[] treeGenusIndices = new int[]{0,1,2,10,20,30,40,50,60,70};
-		//		int[] treeGenusIndices = new int[80];
-		//		for (int i = 0; i < treeGenusIndices.length; i++) {
-		//			treeGenusIndices[i] = i;
-		//		}
+		int[] treeGenusIndices = new int[]{6, // Eibe
+				8, // Linde
+				10, // Erle
+				32, // Haselnuss
+				45, // Buche
+				55}; // Kiefer
+		
+//		int[] treeGenusIndices = new int[80];
+//		for (int i = 0; i < treeGenusIndices.length; i++) {
+//			treeGenusIndices[i] = i;
+//		}
 
 		// test contains()
 		System.out.println("contains:");
