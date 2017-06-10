@@ -23,7 +23,34 @@ public class AllergyAnalysis {
 		data = p.getData();
 		speciesStrings = p.getSpeciesStrings();
 		genusStrings = p.getGenusStrings();
-	}	
+	}
+	
+	/**
+	 * Getter.
+	 * 
+	 * @return data
+	 */
+	public Dataset[] getData() {
+		return data;
+	}
+	
+	/**
+	 * Getter.
+	 * 
+	 * @return speciesStrings
+	 */
+	public ArrayList<String> getSpeciesStrings() {
+		return speciesStrings;
+	}
+	
+	/**
+	 * Getter.
+	 * 
+	 * @return genusStrings
+	 */
+	public ArrayList<String> getGenusStrings() {
+		return genusStrings;
+	}
 	
 	/**
 	 * Calculates the distance in meters for two given points of
@@ -183,7 +210,7 @@ public class AllergyAnalysis {
 	 * 
 	 * @return maxMax
 	 */
-	public double maxMax(double[][] arr) {
+	private double maxMax(double[][] arr) {
 		
 		double max = 0.0;
 		
@@ -196,40 +223,63 @@ public class AllergyAnalysis {
 		return max;
 	}
 	
-	public static void main(String[] args) {
+	/**
+	 * Calculates minimum and maximum over array.
+	 * 
+	 * @param arr
+	 * 
+	 * @return miMa[0] - minimum, miMa[1] - maximum
+	 */
+	public double[] minMax(double[][] arr) {
 		
-		String fullFile = "/users/stud00/mp618/workspace/GitHackathon/res/baeume.csv";
-		AllergyAnalysis aa = new AllergyAnalysis(fullFile);
+		double miMa[] = new double[2];
+		miMa[0] = maxMax(arr);
+		miMa[1] = miMa[0];
 		
-		// testdata
-		double La0 = 54.0592;
-		double Lo0 = 12.0017;
-		double La1 = 54.1075;
-		double Lo1 = 12.2157;
-		
-		// calc distance for testing
-		double metersDiagonal = aa.calcDistanceInMeters(La0, Lo0, La1, Lo1);
-		System.out.println(metersDiagonal);
-		
-		// test input
-		int nLa = 100;
-		int nLo = 100;
-//		int[] treeGenusIndices = new int[]{0,1,2,10,20,30,40,50,60,70};
-		int[] treeGenusIndices = new int[80];
-		for (int i = 0; i < treeGenusIndices.length; i++) {
-			treeGenusIndices[i] = i;
+		for (int i = 0; i < arr.length; i++) {
+			for (int j = 0; j < arr[i].length; j++) {				
+				miMa[0] = miMa[0]>arr[i][j] ? arr[i][j] : miMa[0];
+			}
 		}
 		
-		// test contains
-		System.out.println("contains:");
-		System.out.println(aa.contains(treeGenusIndices, 71));
-		System.out.println(aa.contains(treeGenusIndices, 10));
-		
-		// do analysis
-		double[][] aaData = aa.analyze(La0, Lo0, La1, Lo1, nLa, nLo, treeGenusIndices);
-		
-		// check data
-		double max = aa.maxMax(aaData);
-		System.out.println("max: " + max);
+		return miMa;
 	}
+	
+//	public static void main(String[] args) {
+//		
+//		String fullFile = "/users/stud00/mp618/workspace/GitHackathon/res/baeume.csv";
+//		AllergyAnalysis aa = new AllergyAnalysis(fullFile);
+//		
+//		// testdata
+//		double La0 = 54.0592;
+//		double Lo0 = 12.0017;
+//		double La1 = 54.1075;
+//		double Lo1 = 12.2157;
+//		
+//		// calc distance for testing
+//		double metersDiagonal = aa.calcDistanceInMeters(La0, Lo0, La1, Lo1);
+//		System.out.println(metersDiagonal);
+//		
+//		// test input
+//		int nLa = 100;
+//		int nLo = 100;
+////		int[] treeGenusIndices = new int[]{0,1,2,10,20,30,40,50,60,70};
+//		int[] treeGenusIndices = new int[80];
+//		for (int i = 0; i < treeGenusIndices.length; i++) {
+//			treeGenusIndices[i] = i;
+//		}
+//		
+//		// test contains()
+//		System.out.println("contains:");
+//		System.out.println(aa.contains(treeGenusIndices, 71));
+//		System.out.println(aa.contains(treeGenusIndices, 10));
+//		
+//		// do analysis
+//		double[][] aaData = aa.analyze(La0, Lo0, La1, Lo1, nLa, nLo, treeGenusIndices);
+//		
+//		// check min and max in data
+//		double[] miMa = aa.minMax(aaData);
+//		System.out.println("min: " + miMa[0]);
+//		System.out.println("max: " + miMa[1]);
+//	}
 }
