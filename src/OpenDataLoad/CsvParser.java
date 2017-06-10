@@ -181,9 +181,9 @@ public class CsvParser {
         }		
 	}
 	
-	public static void main(String[] args) {
-		
-		CsvParser p = new CsvParser();
-		p.parseFile("/users/stud00/mp618/workspace/GitHackathon/res/baeume.csv");
-	}
+//	public static void main(String[] args) {
+//		
+//		CsvParser p = new CsvParser();
+//		p.parseFile("/users/stud00/mp618/workspace/GitHackathon/res/baeume.csv");
+//	}
 }

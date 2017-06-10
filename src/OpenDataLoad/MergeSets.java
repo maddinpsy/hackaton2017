@@ -63,13 +63,13 @@ public final class MergeSets {
 	    return hit;
 	}
 	
-	public static void main(String[] args) {
-		
-		int[] arr1 = new int[]{1,2,3,4};
-		int[] arr2 = new int[]{5,6};
-		int[] result =  merge2sets(arr1, arr2);
-		int x=result[1];
-		int y=x;
-		
-	}
+//	public static void main(String[] args) {
+//		
+//		int[] arr1 = new int[]{1,2,3,4};
+//		int[] arr2 = new int[]{5,6};
+//		int[] result =  merge2sets(arr1, arr2);
+//		int x=result[1];
+//		int y=x;
+//		
+//	}
 }
