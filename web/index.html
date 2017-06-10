@@ -47,14 +47,23 @@
 				
 				//show Markers
 				getMarkers(function(data){
-					drawMarkers(data);
+					for(var i=0;i<data.length;i++){
+						drawMarker(data[i]);
+					}
 				});
 				
-				//
+				//Add HeatMap
+				var heat;
+				getTreeOverlay(function(data){
+					heat = L.heatLayer(data, {radius: 25}).addTo(mymap);
+				});
+				
             }
 			
-			function getMarkers(fkt){
-				var url="http://"+getLocation(window.location.href).hostname+":8080/markers";
+			
+			
+			function getTreeOverlay(fkt){
+				var url="http://localhost:8080/trees";
 				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
 				re1.done(function onSuccess(data,a,b){
 					fkt(data);
@@ -64,30 +73,58 @@
 				});
 			}
 			
-			function drawMarkers(data){
-				for(var i=0;i<data.length;i++){
-					var marker = L.marker(
-					    [data[i].lat, data[i].lon],
-						{"draggable":true,
-						contextmenu: true,
-						contextmenuItems: [{
-							text: 'DeleteMarker',
-							callback: deleteMarker,
-							index: 1
-						}]
-						});
-					marker.addTo(mymap);
-					marker.serverId=data[i].id;
-					marker.on("moveend",function(event){
-						var marker=event.target;
-						sendMarkers({"id":marker.serverId,
-									   "lat": marker.getLatLng().lat,
-									   "lon": marker.getLatLng().lng,
-									   "description":marker.getPopup().getContent()}
-									 );
+			function getMarkers(fkt){
+				var url="http://localhost:8080/markers";
+				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
+				re1.done(function onSuccess(data,a,b){
+					fkt(data);
+				});
+				re1.fail(function onSuccess(data,err){
+					alert("error:"+err);
+				});
+			}
+			
+			
+			function syncMarkers(data){
+				mymap.eachLayer(function(marker){
+					//Remove all markers, that are not on the server anymore
+					found=false;
+					for(var i=0;i<data.length;i++){
+						if(marker.serverID==data[i].id){
+							found=true;
+						}
+					}
+					if(!found){
+						marker.remove();
+					}
+					//Add markers, which had been added to ther server
+					
+				});
+			}
+			
+			
+			function drawMarker(data){
+				var marker = L.marker(
+					[data.lat, data.lon],
+					{"draggable":true,
+					contextmenu: true,
+					contextmenuItems: [{
+						text: 'DeleteMarker',
+						callback: deleteMarker,
+						index: 1
+					}]
 					});
-					marker.bindPopup(data[i].description);
-				}
+				marker.addTo(mymap);
+				marker.serverId=data.id;
+				marker.on("moveend",function(event){
+					var marker=event.target;
+					sendMarkers({"id":marker.serverId,
+								   "lat": marker.getLatLng().lat,
+								   "lon": marker.getLatLng().lng,
+								   "description":marker.getPopup().getContent()}
+								 );
+				});
+				marker.bindPopup(data.description);
 			}
 			
 			function addMarkers(e){
@@ -141,7 +178,7 @@
 			}
 			
 			function sendMarkers(marker, onSuccess){
-				var url="http://"+getLocation(window.location.href).hostname+":8080/markers";
+				var url="http://localhost:8080/markers";
 				var re1=$.post({url: url,
 							    data:JSON.stringify(marker),
 								dataType: "json",
@@ -155,7 +192,7 @@
 			}
 			
 			function deleteMarkerFromServer(serverID, onSuccess){
-				var url="http://"+getLocation(window.location.href).hostname+":8080/markers/delete";
+				var url="http://localhost:8080/markers/delete";
 				var re1=$.post({url: url,
 							    data:"{id:"+serverID+"}",
 								dataType: "json",
