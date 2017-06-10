@@ -35,9 +35,13 @@ public class TreeKindHandler implements HttpHandler {
 			arg0.getResponseHeaders().add("Content-type", "application/json");
 
 			// Replay with treekinds to a get request
+			JSONArray resp = new JSONArray();
 			if (arg0.getRequestMethod().equals("GET")) {
 				// Get all Data
-				String response = new JSONArray(selectedTrees).toString();
+				for(String key:this.selectedTrees.keySet()){
+					resp.put(new JSONObject("{'name':'"+key+"','sel':'"+selectedTrees.get(key)+"'}"));
+				}
+				String response = resp.toString();
 				arg0.sendResponseHeaders(200, response.length());
 				OutputStream os = arg0.getResponseBody();
 				os.write(response.getBytes());

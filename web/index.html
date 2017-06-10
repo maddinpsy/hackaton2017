@@ -25,6 +25,13 @@
 			  crossorigin="anonymous"></script>
         <title>JSP Page</title>
         <script>
+			function getLocation(href) {
+				var l = document.createElement("a");
+				l.href = href;
+				return l;
+			}
+			//var SERVER_URL="http://localhost:8080";
+			var SERVER_URL="http://"+getLocation(window.location.href).hostname+":8080";
             document.addEventListener('DOMContentLoaded', initMap, false);
             function initMap() {
                 mymap = L.map('mapid',
@@ -66,7 +73,7 @@
 				//UpdateMarkers
 				if(typeof(interval) !== "undefined")
 					clearInterval(interval)
-				//interval=setInterval(function(){getMarkers(syncMarkers)},1000);
+				interval=setInterval(function(){getMarkers(syncMarkers)},1000);
 				
 				
 				
@@ -80,12 +87,15 @@
 					}
 				});
 				
+				
+				//Fill TreeKind List
+				getTreeKinds(initTreeKindList);
             }
 			
 			
 			
 			function getTreeOverlay(fkt){
-				var url="http://localhost:8080/trees";
+				var url=SERVER_URL+"/trees";
 				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
 				re1.done(function onSuccess(data,a,b){
 					fkt(data);
@@ -96,7 +106,7 @@
 			}
 			
 			function getMarkers(fkt){
-				var url="http://localhost:8080/markers";
+				var url=SERVER_URL+"/markers";
 				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
 				re1.done(function onSuccess(data,a,b){
 					fkt(data);
@@ -217,7 +227,7 @@
 			}
 			
 			function sendMarkers(marker, onSuccess){
-				var url="http://localhost:8080/markers";
+				var url=SERVER_URL+"/markers";
 				var re1=$.post({url: url,
 							    data:JSON.stringify(marker),
 								dataType: "json",
@@ -231,7 +241,7 @@
 			}
 			
 			function deleteMarkerFromServer(serverID, onSuccess){
-				var url="http://localhost:8080/markers/delete";
+				var url= SERVER_URL + "/markers/delete";
 				var re1=$.post({url: url,
 							    data:"{id:"+serverID+"}",
 								dataType: "json",
@@ -255,14 +265,9 @@
 				  mymap.zoomOut();
 			  }
 	
-			var getLocation = function(href) {
-				var l = document.createElement("a");
-				l.href = href;
-				return l;
-			};
 			
 			function getTreeKinds(fkt){
-				var url="http://localhost:8080/treekinds";
+				var url= SERVER_URL + "/treekinds";
 				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
 				re1.done(function onSuccess(data){
 					fkt(data);
@@ -274,6 +279,14 @@
 			
 			function initTreeKindList(data){
 				console.log(data);
+				for(var i=0;i<data.length;i++){
+					//$("#treeKindSelection").append('<li><label for="chk'+i+'"><input type="checkbox" name="chk'+i+'" id="chk'+i'">'+data[i]+'</label></li>');
+				}
+				//$("treeKindSelection")
+				//"<li><label for="chk1"><input type="checkbox" name="chk1" id="chk1">First</label></li>
+			}
+			
+			function updateTreeKindList(){
 				//$("treeKindSelection")
 				//"<li><label for="chk1"><input type="checkbox" name="chk1" id="chk1">First</label></li>
 			}
@@ -292,6 +305,6 @@
 		   <li><label for="chk5"><input type="checkbox" name="chk5" id="chk5">Fifth</label></li>
 		   <li><label for="chk6"><input type="checkbox" name="chk6" id="chk6">Sixth</label></li>
 		</ul>
-
+		<input type="button" value="Bestätigen" onclick="updateTreeKindList" style="float: right;"/>
     </body>
 </html>
