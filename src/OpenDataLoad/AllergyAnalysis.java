@@ -9,7 +9,7 @@ public class AllergyAnalysis {
 	private static final double WEIGHTFACTOR = 1.0;
 	private static final double D_DISTANCE_LA = 111194.92664455873; // approx distance in meter per degree
 	private static final double D_DISTANCE_LO = 65358.19505379952; // approx distance in meter per degree
-	private static final double MAXDISTANCEMETERS = 110.0;	// max weighted distance of tree [meters]
+	private static final double MAXDISTANCEMETERS = 140.0;	// max weighted distance of tree [meters]
 	private static final double HALFDISTANCEMETERS = MAXDISTANCEMETERS/4; // half weight distance [meters]
 	// expconst = ln(A_0/A(x))/x
 	private static final double EXPCONST = Math.log(2)/HALFDISTANCEMETERS;
