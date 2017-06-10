@@ -1,6 +1,5 @@
 package RestServer;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -16,30 +15,52 @@ import OpenDataLoad.Dataset;
 
 public class TreeHandler implements HttpHandler {
 
-	private Dataset[] data;
+	private double[][] data;
 
-	public TreeHandler(Dataset[] data) {
-		this.data=data;
+	public TreeHandler(double[][] data) {
+		this.data = data;
 	}
 
-	private JSONArray buildJsonFromTrees(){
+	private JSONArray buildJsonFromTrees(
+			double La0, //BottomLeft
+			double Lo0, //BottomLeft
+			double La1, //TopRight
+			double Lo1, //TopRight
+			int nLa, //Anzahl Elemente in lat richtung
+			int nLo //Anzahl Elemente in Lon richtung
+			)
+	{
+		double dLa = (La1 - La0) / (nLa - 1);
+		double dLo = (Lo1 - Lo0) / (nLo - 1);
+
 		JSONArray result = new JSONArray();
-		for(Dataset tree:data){
-			try {
-				result.put(new JSONArray("["
-						+ tree.getLatitude()
-						+ ","+tree.getLongitude()
-						+ ",0.1]"));
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[i].length; j++) {
+				try {
+					result.put(new JSONArray("[" 
+				         + (La0 + dLa*i) 
+				         + "," 
+				         + (Lo0 + dLo*j) 
+				         + "," 
+				         + data[i][j] + "]"));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		return result;
 	}
-	
+
 	@Override
 	public void handle(HttpExchange arg0) throws IOException {
+		double La0 = 54.0592;
+		double Lo0 = 12.0017;
+		double La1 = 54.1075;
+		double Lo1 = 12.2157;
+		int nLa = 10;
+		int nLo = 10;
+		
 		// Always send Header for CrossDomain
 		arg0.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 		arg0.getResponseHeaders().add("Access-Control-Allow-Methods", "POST, GET, DELETE");
@@ -48,7 +69,7 @@ public class TreeHandler implements HttpHandler {
 		arg0.getResponseHeaders().add("Content-type", "application/json");
 		try {
 			if (arg0.getRequestMethod().equals("GET")) {
-				String response = buildJsonFromTrees().toString();
+				String response = buildJsonFromTrees(La0,Lo0,La1,Lo1, nLa,nLo).toString();
 				arg0.sendResponseHeaders(200, response.length());
 				OutputStream os = arg0.getResponseBody();
 				os.write(response.getBytes());

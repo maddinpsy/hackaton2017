@@ -28,7 +28,7 @@ public class Test {
         Store store = new Store();
         
 		server.createContext("/markers", new MarkerHandler(store));
-        server.createContext("/trees", new TreeHandler(data));
+        server.createContext("/trees", new TreeHandler(getAnalysDate()));
         
         server.start();
     }
@@ -46,8 +46,8 @@ public class Test {
 		
 		
 		// test input
-		int nLa = 100;
-		int nLo = 100;
+		int nLa = 10;
+		int nLo = 10;
 		int[] treeGenusIndices = new int[80];
 		for (int i = 0; i < treeGenusIndices.length; i++) {
 			treeGenusIndices[i] = i;
