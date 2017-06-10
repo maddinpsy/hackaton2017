@@ -18,7 +18,7 @@ public final class MergeSets {
 		int[] result = null;
 		int[] resultTemp = null;
 		
-		if (arr1!=null && arr2!=null) {
+		if (arr1!=null) {
 		
 			resultTemp = new int[arr1.length+arr2.length];
 			int i = 0;
@@ -26,6 +26,7 @@ public final class MergeSets {
 				resultTemp[i] = arr1[i];
 			}
 			int endIndex = i-1;
+			
 			for (int k=0; k < arr2.length; k++) {
 				if (!contains(arr1, arr2[k])) {
 					endIndex++;
