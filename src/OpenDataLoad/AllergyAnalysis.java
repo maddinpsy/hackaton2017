@@ -139,6 +139,100 @@ public class AllergyAnalysis {
 	}
 	
 	/**
+	 * Faster version of analysis.
+	 * 
+	 * @param La0 Latitude start
+	 * @param Lo0 Longitude start
+	 * @param La1 Latitude end
+	 * @param Lo1 Longitude end
+	 * @param nLa number of points in latitude dimension
+	 * @param nLo number of points in longitude dimension
+	 * @param treeGenusIndices array of indices of trees that trigger the allergy
+	 * 
+	 * @return matrix of intensity [nLa][nLo]
+	 */
+	public double[][] analyze2(double La0, double Lo0,
+			double La1, double Lo1,
+			int nLa, int nLo,
+			int[] treeGenusIndices) {
+		
+		// create return data, init with 0.0
+		double[][] result = new double[nLa][nLo];
+		
+		// calc dLa, dLo
+		double dLa = (La1-La0) / (nLa-1); // one less steps then points
+		double dLo = (Lo1-Lo0) / (nLo-1); // one less steps then points
+		double La0Temp;
+		double Lo0Temp;
+		
+		// test output: steps in meters
+//		System.out.println("dLa[m]: " + calcDistanceInMeters(La0, Lo0, La0+dLa, Lo0));
+//		System.out.println("dLo[m]: " + calcDistanceInMeters(La0, Lo0, La0, Lo0+dLo));
+		
+		// iterate la
+		for (int i = 0; i < nLa; i++) {
+			
+			// progress feedback
+			System.out.println("" + ((double)100.0*i/nLa) + " %");
+			
+			La0Temp = La0+i*dLa; // calc new La_pos
+			
+			// iterate lo
+			for (int j = 0; j < nLo; j++) {
+				
+				Lo0Temp = Lo0+j*dLo;// calc new Lo_pos
+				
+				// iterate data
+				for (int k = 0; k < data.length; k++) {
+
+					// calc intensity for (la, lo) depending on treeGenusIndices
+					result[i][j] += calcIntensity(La0Temp, Lo0Temp, data[k], treeGenusIndices);					
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Calculates minimum and maximum grid-indices for tree position and MAXDISTANCEMETERS.
+	 * 
+	 * @param posNowLa
+	 * @param posNowLo
+	 * @param La0
+	 * @param Lo0
+	 * @param La1
+	 * @param Lo1
+	 * @param dLa
+	 * @param dLo
+	 * 
+	 * @return int[4]{LaMinIdx, LaMaxIdx, LoMinIdx, LoMaxIdx}
+	 */
+	private int[] approximateIndexBorders(double posNowLa, double posNowLo,
+			double La0, double Lo0, double La1, double Lo1, double dLa, double dLo) {
+		
+		int[] result = new int[4]; // {LaMinIdx, LaMaxIdx, LoMinIdx, LoMaxIdx}
+		double dLaMeters = calcDistanceInMeters(La0, Lo0, La0+dLa, Lo0);
+		double dLoMeters = calcDistanceInMeters(La0, Lo0, La0, Lo0+dLo);
+		
+		// calc default position
+		result[0] = (int) ((posNowLa-La0) / dLa); // LaMinIdx
+		result[1] = 0; // LaMaxIdx
+		result[2] = 0; // LoMinIdx
+		result[3] = 0; // LoMaxIdx					
+		
+		// calc LaMinIdx
+		
+		// calc LaMaxIdx
+		
+		// calc LoMinIdx
+		
+		// calc LoMaxIdx
+		
+		return null;
+	}
+	
+	/**
 	 * Calculates intensity for one coordinate-point, one data entry and array treeGenusIndices.
 	 * 
 	 * @param la0 latitude

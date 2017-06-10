@@ -32,17 +32,19 @@ public class TreeHandler implements HttpHandler {
 	{
 		double dLa = (La1 - La0) / (nLa - 1);
 		double dLo = (Lo1 - Lo0) / (nLo - 1);
+		double La0Temp;
+		double Lo0Temp;
 
 		JSONArray result = new JSONArray();
 		for (int i = 0; i < data.length; i++) {
-			La0 += dLa; // calc new La_pos
+			La0Temp = La0+i*dLa; // calc new La_pos
 			for (int j = 0; j < data[i].length; j++) {
-				Lo0 += dLo; // calc new Lo_pos
+				Lo0Temp = Lo0+j*dLo;// calc new Lo_pos
 				try {
 					result.put(new JSONArray("[" 
-				         + La0 
+				         + La0Temp 
 				         + ","
-				         + Lo0 
+				         + Lo0Temp 
 				         + "," 
 				         + data[i][j] + "]"));
 				} catch (JSONException e) {
