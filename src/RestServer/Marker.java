@@ -10,11 +10,15 @@ public class Marker {
 	private String description;
 	
 	public Marker() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public Marker(JSONObject json) throws JSONException {
-		this.id=(int) json.get("id");
+		if(json.has("id")){
+			this.id=(int) json.get("id");
+		}else{
+			this.id=0; //leaf it 0, store will set it
+		}
+		
 		this.lat=(double) json.get("lat");
 		this.lon=(double) json.get("lon");
 		this.description=json.get("description").toString();

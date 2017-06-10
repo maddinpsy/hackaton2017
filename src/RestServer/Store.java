@@ -4,6 +4,7 @@ package RestServer;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,22 +33,35 @@ public class Store {
 		return new JSONArray(markers.values());
 	}
 
-	public String addMarker(JSONObject newObj) {
+	/**
+	 * Für das gegeben Object hinzu und erzeugt eine ID, fass diese 0 war. 
+	 * @param newObj
+	 * @return die Id des neuen Objects oder -1 bei einem Fehler.
+	 */
+	public Integer addMarker(JSONObject newObj) {
 		try {
 			Marker marker = new Marker(newObj);
+			if(marker.getId()==0){
+				//Increaing id, TODO: Overflow at maxint!
+				if(markers.keySet().isEmpty()){
+					marker.setId(1);
+				}else{
+					marker.setId(Collections.max(markers.keySet())+1);
+				}
+			}
 			markers.put(marker.getId(),marker);
-			return "Ok";
+			return marker.getId();
 		} catch (JSONException e) {
-			return "Error";
+			return -1;
 		}
 	}
 
 	public String removeMarker(JSONObject newObj) {
 		try {
 			markers.remove((int)newObj.get("id"));
-			return "Ok";
+			return "ok";
 		} catch (JSONException e) {
-			return "Error";
+			return "error" + e.getMessage();
 		}
 	}
 }

@@ -3,20 +3,170 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script src="leaflet/leaflet.js" type="text/javascript"></script>
+		<link rel="stylesheet" href="leaflet/leaflet.contextmenu.css"/>
+		<script src="leaflet/leaflet.contextmenu.js"></script>
+		<script src="leaflet/leaflet-heat.js"></script>
         <link href="leaflet/leaflet.css" rel="stylesheet" type="text/css"/>
+		<script
+			  src="https://code.jquery.com/jquery-3.2.1.min.js"
+			  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			  crossorigin="anonymous"></script>
         <title>JSP Page</title>
         <script>
             document.addEventListener('DOMContentLoaded', initMap, false);
             function initMap() {
-                var mymap = L.map('mapid').setView([54.083336, 12.108811], 13);
-                L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                mymap = L.map('mapid',
+				  {
+				  contextmenu: true,
+				  contextmenuWidth: 140,
+					  contextmenuItems: [{
+						  text: 'AddMarker',
+						  callback: addMarkers
+					  }, {
+						  text: 'Center map here',
+						  callback: centerMap
+					  }, '-', {
+						  text: 'Zoom in',
+						  icon: 'leaflet/images/zoom-in.png',
+						  callback: zoomIn
+					  }, {
+						  text: 'Zoom out',
+						  icon: 'leaflet/images/zoom-out.png',
+						  callback: zoomOut
+				  }]
+				  });
+				
+				mymap.setView([54.083336, 12.108811], 13);
+				L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>',
                     maxZoom: 18,
                     id: 'your.mapbox.project.id',
                     accessToken: 'your.mapbox.public.access.token'
                 }
                 ).addTo(mymap);
+				
+				//show Markers
+				getMarkers(function(data){
+					drawMarkers(data);
+				});
+				
+				//
             }
+			
+			function getMarkers(fkt){
+				var url="http://"+getLocation(window.location.href).hostname+":8080/markers";
+				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
+				re1.done(function onSuccess(data,a,b){
+					fkt(data);
+				});
+				re1.fail(function onSuccess(data,err){
+					alert("error:"+err);
+				});
+			}
+			
+			function drawMarkers(data){
+				for(var i=0;i<data.length;i++){
+					var marker = L.marker(
+					    [data[i].lat, data[i].lon],
+						{"draggable":true,
+						contextmenu: true,
+						contextmenuItems: [{
+							text: 'DeleteMarker',
+							callback: deleteMarker,
+							index: 1
+						}]
+						});
+					marker.addTo(mymap);
+					marker.serverId=data[i].id;
+					marker.on("moveend",function(event){
+						var marker=event.target;
+						sendMarkers({"id":marker.serverId,
+									   "lat": marker.getLatLng().lat,
+									   "lon": marker.getLatLng().lng,
+									   "description":marker.getPopup().getContent()}
+									 );
+					});
+					marker.bindPopup(data[i].description);
+				}
+			}
+			
+			function addMarkers(e){
+				var marker = L.marker(e.latlng,{"draggable":true}).addTo(mymap);
+				var editField="<textarea id='newMarker'></textarea>";
+				var newPop=marker.bindPopup(editField).openPopup();
+				//TODO set focus to textarea
+				//newPop.on("popupopen",function(){$("#newMarker").focus();});
+				$("#newMarker").on("blur",function saveNewMarker(){
+					marker.description=$("#newMarker").val();
+					sendMarkers({
+					    "lat": marker.getLatLng().lat,
+					    "lon": marker.getLatLng().lng,
+					    "description":marker.description
+					},function(data){
+					    //TODO was tun im fehlerfall if(data==null || data=="" || data==-1)
+						marker.serverId=data;
+						marker.bindPopup(marker.description);
+					});
+				});
+			}
+			
+			function deleteMarker(e){
+				deleteMarkerFromServer(e.relatedTarget.serverId,
+				function(result){
+					if(result=="ok"){
+						e.relatedTarget.remove();	
+					}else{
+						console.log(result);
+					}
+				});
+				
+			}
+			
+			function sendMarkers(marker, onSuccess){
+				var url="http://"+getLocation(window.location.href).hostname+":8080/markers";
+				var re1=$.post({url: url,
+							    data:JSON.stringify(marker),
+								dataType: "json",
+								crossDomain: true }
+							  );
+				re1.done(onSuccess),
+				//onError
+				re1.fail(function(data){
+					console.log(data);
+				});
+			}
+			
+			function deleteMarkerFromServer(serverID, onSuccess){
+				var url="http://"+getLocation(window.location.href).hostname+":8080/markers";
+				var re1=$.ajax({url: url,
+								type: 'delete',
+							    data:{"id":serverID},
+								dataType: "json",
+								crossDomain: true }
+							  );
+				re1.done(onSuccess),
+				//onError
+				re1.fail(function(data){
+					console.log(data);
+				});
+			}
+			
+			 function centerMap (e) {
+				  mymap.panTo(e.latlng);
+			  }
+			  function zoomIn (e) {
+				  mymap.zoomIn();
+			  }
+			  function zoomOut (e) {
+				  mymap.zoomOut();
+			  }
+	
+			var getLocation = function(href) {
+				var l = document.createElement("a");
+				l.href = href;
+				return l;
+			};
+			
         </script>
     </head>
     <body>
