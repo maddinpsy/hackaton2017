@@ -7,6 +7,18 @@
 		<script src="leaflet/leaflet.contextmenu.js"></script>
 		<script src="leaflet/leaflet-heat.js"></script>
         <link href="leaflet/leaflet.css" rel="stylesheet" type="text/css"/>
+		<style>
+		select, ul {
+		  overflow: auto;height:200px;
+		  border: 1px solid #000;
+		}
+		ul { list-style-type: none; margin: 0;
+		    padding: 0; overflow-x: hidden;
+		}
+		li { margin: 0; padding: 0; }
+		label { display: block; color: WindowText; background-color: Window; margin: 0; padding: 0; width: 100%; }
+		label:hover { background-color: Highlight; color: HighlightText; }
+		</style>
 		<script
 			  src="https://code.jquery.com/jquery-3.2.1.min.js"
 			  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
@@ -51,11 +63,21 @@
 						drawMarker(data[i]);
 					}
 				});
+				//UpdateMarkers
+				if(typeof(interval) !== "undefined")
+					clearInterval(interval)
+				//interval=setInterval(function(){getMarkers(syncMarkers)},1000);
+				
+				
 				
 				//Add HeatMap
 				var heat;
 				getTreeOverlay(function(data){
-					heat = L.heatLayer(data, {radius: 25}).addTo(mymap);
+					//heat = L.heatLayer(data, {radius: 25}).addTo(mymap);
+					for(var i=0;i<data.length;i++){
+						var m=L.marker([data[i][0], data[i][1]]).addTo(mymap);
+						m.bindPopup("lat:"+data[i][0] + " lon:" + data[i][1] +"<br>"+ data[i][2]);
+					}
 				});
 				
             }
@@ -81,6 +103,7 @@
 				});
 				re1.fail(function onSuccess(data,err){
 					alert("error:"+err);
+					if(typeof(interval) !== "undefined") clearInterval(interval)
 				});
 			}
 			
@@ -88,18 +111,34 @@
 			function syncMarkers(data){
 				mymap.eachLayer(function(marker){
 					//Remove all markers, that are not on the server anymore
-					found=false;
+					var found=false;
 					for(var i=0;i<data.length;i++){
-						if(marker.serverID==data[i].id){
+						if(marker.serverId==data[i].id){
 							found=true;
+							break;
 						}
 					}
-					if(!found){
+					if(!found && marker._icon && !marker.isPopupOpen()){
 						marker.remove();
 					}
-					//Add markers, which had been added to ther server
-					
 				});
+				//Add markers, which had been added to the server
+				for(var i=0;i<data.length;i++){
+					var found=false;
+					mymap.eachLayer(function(marker){
+						if(marker.serverId==data[i].id){
+							found=true;
+							//prüfen ob verschoben wurde
+							if(marker.getLatLng().lat!=data[i].lat || marker.getLatLng().lon!=data[i].lon){
+								marker.setLatLng([data[i].lat,data[i].lon]);
+							}
+						}
+					});
+					if(!found){
+						drawMarker(data[i]);
+					}
+				}
+				
 			}
 			
 			
@@ -222,11 +261,37 @@
 				return l;
 			};
 			
+			function getTreeKinds(fkt){
+				var url="http://localhost:8080/treekinds";
+				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
+				re1.done(function onSuccess(data){
+					fkt(data);
+				});
+				re1.fail(function onSuccess(data,err){
+					console.log(err);
+				});
+			}
+			
+			function initTreeKindList(data){
+				console.log(data);
+				//$("treeKindSelection")
+				//"<li><label for="chk1"><input type="checkbox" name="chk1" id="chk1">First</label></li>
+			}
+			
         </script>
     </head>
     <body>
         <h1>Hello Map!</h1>
-        <div id="mapid" style="height: 480px; "></div>
+        <div id="mapid" style="height: 480px; width:80%; float: left; margin-right:5px;"></div>
+		Baumarten auswählen
+		<ul id="treeKindSelection">
+		   <li><label for="chk1"><input type="checkbox" name="chk1" id="chk1">First</label></li>
+		   <li><label for="chk2"><input type="checkbox" name="chk2" id="chk2">Second</label></li>
+		   <li><label for="chk3"><input type="checkbox" name="chk3" id="chk3">Third</label></li>
+		   <li><label for="chk4"><input type="checkbox" name="chk4" id="chk4">Fourth</label></li>
+		   <li><label for="chk5"><input type="checkbox" name="chk5" id="chk5">Fifth</label></li>
+		   <li><label for="chk6"><input type="checkbox" name="chk6" id="chk6">Sixth</label></li>
+		</ul>
 
     </body>
 </html>

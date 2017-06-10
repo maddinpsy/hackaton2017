@@ -29,6 +29,7 @@ public class Test {
         
 		server.createContext("/markers", new MarkerHandler(store));
         server.createContext("/trees", new TreeHandler(getAnalysDate()));
+        server.createContext("/treekinds", new TreeKindHandler(p.getGenusStrings()));
         
         server.start();
     }
