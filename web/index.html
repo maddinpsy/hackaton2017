@@ -51,6 +51,12 @@
 						drawMarker(data[i]);
 					}
 				});
+				//UpdateMarkers
+				if(typeof(interval) !== "undefined")
+					clearInterval(interval)
+				interval=setInterval(function(){getMarkers(syncMarkers)},1000);
+				
+				
 				
 				//Add HeatMap
 				var heat;
@@ -88,18 +94,34 @@
 			function syncMarkers(data){
 				mymap.eachLayer(function(marker){
 					//Remove all markers, that are not on the server anymore
-					found=false;
+					var found=false;
 					for(var i=0;i<data.length;i++){
-						if(marker.serverID==data[i].id){
+						if(marker.serverId==data[i].id){
 							found=true;
+							break;
 						}
 					}
-					if(!found){
+					if(!found && marker._icon && !marker.isPopupOpen()){
 						marker.remove();
 					}
-					//Add markers, which had been added to ther server
-					
 				});
+				//Add markers, which had been added to the server
+				for(var i=0;i<data.length;i++){
+					var found=false;
+					mymap.eachLayer(function(marker){
+						if(marker.serverId==data[i].id){
+							found=true;
+							//prüfen ob verschoben wurde
+							if(marker.getLatLng().lat!=data[i].lat || marker.getLatLng().lon!=data[i].lon){
+								marker.setLatLng([data[i].lat,data[i].lon]);
+							}
+						}
+					});
+					if(!found){
+						drawMarker(data[i]);
+					}
+				}
+				
 			}
 			
 			
