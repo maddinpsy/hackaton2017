@@ -197,11 +197,11 @@ public class AllergyAnalysis {
 	}
 	
 	/**
-	 * Calculates minimum over array.
+	 * Calculates minimum and maximum over array.
 	 * 
 	 * @param arr
 	 * 
-	 * @return minMin
+	 * @return miMa[0] - minimum, miMa[1] - maximum
 	 */
 	public double[] minMax(double[][] arr) {
 		
@@ -242,7 +242,7 @@ public class AllergyAnalysis {
 			treeGenusIndices[i] = i;
 		}
 		
-		// test contains
+		// test contains()
 		System.out.println("contains:");
 		System.out.println(aa.contains(treeGenusIndices, 71));
 		System.out.println(aa.contains(treeGenusIndices, 10));
@@ -250,7 +250,7 @@ public class AllergyAnalysis {
 		// do analysis
 		double[][] aaData = aa.analyze(La0, Lo0, La1, Lo1, nLa, nLo, treeGenusIndices);
 		
-		// check data
+		// check min and max in data
 		double[] miMa = aa.minMax(aaData);
 		System.out.println("min: " + miMa[0]);
 		System.out.println("max: " + miMa[1]);
