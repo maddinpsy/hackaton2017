@@ -15,7 +15,7 @@
 		ul { list-style-type: none; margin: 0;
 		    padding: 0; overflow-x: hidden;
 		}
-		li { margin: 0; padding: 0; }
+		li { margin: 0; padding: 0; overflow: hidden; white-space: nowrap;}
 		label { display: block; color: WindowText; background-color: Window; margin: 0; padding: 0; width: 100%; }
 		label:hover { background-color: Highlight; color: HighlightText; }
 		</style>
@@ -73,7 +73,10 @@
 				//UpdateMarkers
 				if(typeof(interval) !== "undefined")
 					clearInterval(interval)
-				interval=setInterval(function(){getMarkers(syncMarkers)},1000);
+				interval=setInterval(function(){
+					getMarkers(syncMarkers)
+					getAktiveTrees(updateTreeKindListLocal)
+				},1000);
 				
 				
 				
@@ -267,6 +270,17 @@
 	
 			
 			function getTreeKinds(fkt){
+				var url= SERVER_URL + "/treekinds/names";
+				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
+				re1.done(function onSuccess(data){
+					fkt(data);
+				});
+				re1.fail(function onSuccess(data,err){
+					console.log(err);
+				});
+			}
+			
+			function getAktiveTrees(fkt){
 				var url= SERVER_URL + "/treekinds";
 				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
 				re1.done(function onSuccess(data){
@@ -278,17 +292,38 @@
 			}
 			
 			function initTreeKindList(data){
-				console.log(data);
 				for(var i=0;i<data.length;i++){
-					//$("#treeKindSelection").append('<li><label for="chk'+i+'"><input type="checkbox" name="chk'+i+'" id="chk'+i'">'+data[i]+'</label></li>');
+					if(data[i].name.indexOf("lweide/Elaeagnus")==-1)
+					$("#treeKindSelection").append('<li><label for="chk'+i+'"><input type="checkbox" name="chk'+i+'" id="chk'+i+'">'+data[i].name+'</label></li>');
 				}
-				//$("treeKindSelection")
-				//"<li><label for="chk1"><input type="checkbox" name="chk1" id="chk1">First</label></li>
+			}
+			
+			function updateTreeKindListLocal(data){
+				$("[id^=chk]").prop("checked",false);
+				for(var i=0;i<data.length;i++){
+					$("#chk"+data[i]).prop("checked",true);
+				}
 			}
 			
 			function updateTreeKindList(){
-				//$("treeKindSelection")
-				//"<li><label for="chk1"><input type="checkbox" name="chk1" id="chk1">First</label></li>
+				var data=[];
+				$("li").each(function(){
+					if($(this).find("input").prop("checked"))
+						data.push($(this).find("input").attr("id").substr(3));
+				});
+				var url= SERVER_URL + "/treekinds";
+				var re1=$.post({ type: 'post',
+						url: url,
+						data:JSON.stringify(data),
+						dataType: "json",
+						crossDomain: true
+						});
+				re1.done(function onSuccess(data){
+					
+				});
+				re1.fail(function onSuccess(data,err){
+					console.log(err);
+				});
 			}
 			
         </script>
@@ -298,13 +333,7 @@
         <div id="mapid" style="height: 480px; width:80%; float: left; margin-right:5px;"></div>
 		Baumarten auswählen
 		<ul id="treeKindSelection">
-		   <li><label for="chk1"><input type="checkbox" name="chk1" id="chk1">First</label></li>
-		   <li><label for="chk2"><input type="checkbox" name="chk2" id="chk2">Second</label></li>
-		   <li><label for="chk3"><input type="checkbox" name="chk3" id="chk3">Third</label></li>
-		   <li><label for="chk4"><input type="checkbox" name="chk4" id="chk4">Fourth</label></li>
-		   <li><label for="chk5"><input type="checkbox" name="chk5" id="chk5">Fifth</label></li>
-		   <li><label for="chk6"><input type="checkbox" name="chk6" id="chk6">Sixth</label></li>
 		</ul>
-		<input type="button" value="Bestätigen" onclick="updateTreeKindList" style="float: right;"/>
+		<input type="button" value="Bestätigen" onclick="updateTreeKindList()" style="float: right;"/>
     </body>
 </html>

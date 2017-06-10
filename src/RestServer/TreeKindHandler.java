@@ -14,16 +14,14 @@ import com.sun.net.httpserver.HttpHandler;
 
 public class TreeKindHandler implements HttpHandler {
 
-	private HashMap<String, Boolean> selectedTrees;
+	private ArrayList<String> allTrees;
+	private boolean[] selected;
 
 	public TreeKindHandler(ArrayList<String> treeKinds) {
-		this.selectedTrees=new HashMap<>(treeKinds.size());
-		for(String treename:treeKinds){
-			this.selectedTrees.put(treename,false);
-		}
+		this.allTrees = treeKinds;
+		this.selected = new boolean[treeKinds.size()];
 	}
-	
-	
+
 	@Override
 	public void handle(HttpExchange arg0) throws IOException {
 		try {
@@ -37,18 +35,33 @@ public class TreeKindHandler implements HttpHandler {
 			// Replay with treekinds to a get request
 			JSONArray resp = new JSONArray();
 			if (arg0.getRequestMethod().equals("GET")) {
-				// Get all Data
-				for(String key:this.selectedTrees.keySet()){
-					resp.put(new JSONObject("{'name':'"+key+"','sel':'"+selectedTrees.get(key)+"'}"));
+				//Get Names
+				if (arg0.getRequestURI().toString().contains("names")) {
+					// Get all Data
+					for (int i = 0; i < allTrees.size(); i++) {
+						resp.put(new JSONObject("{'name':'" + allTrees.get(i) + "','sel':'" + selected[i] + "'}"));
+					}
+					String response = resp.toString();
+					arg0.sendResponseHeaders(200, response.length());
+					OutputStream os = arg0.getResponseBody();
+					os.write(response.getBytes());
+					os.close();
+				} else {
+					// Get aktive IDs only
+					for (int i = 0; i < allTrees.size(); i++) {
+						if(selected[i])
+							resp.put(new JSONObject("{'name':'" + allTrees.get(i) + "','sel':'" + selected[i] + "'}"));
+					}
+					String response = resp.toString();
+					arg0.sendResponseHeaders(200, response.length());
+					OutputStream os = arg0.getResponseBody();
+					os.write(response.getBytes());
+					os.close();
 				}
-				String response = resp.toString();
-				arg0.sendResponseHeaders(200, response.length());
-				OutputStream os = arg0.getResponseBody();
-				os.write(response.getBytes());
-				os.close();
 				// add new marker/or change existing on post
 			} else if (arg0.getRequestMethod().equals("POST")) {
-				// First get the message body, which is the list with selected trees
+				// First get the message body, which is the list with selected
+				// trees
 				InputStream is = arg0.getRequestBody();
 				java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
 				if (!s.hasNext())
@@ -56,15 +69,15 @@ public class TreeKindHandler implements HttpHandler {
 				String strObj = s.next();
 				System.out.println(strObj);
 				JSONArray client_select = new JSONArray(strObj);
-	
+
 				// deselect all trees in the servers list
-				for(String key:this.selectedTrees.keySet()){
-					this.selectedTrees.put(key, false);
+				for (int i = 0; i < selected.length; i++) {
+					selected[i] = false;
 				}
-				//And select the given ones
-				for(int i=0;i<client_select.length();i++){
-					JSONObject itm = (JSONObject) client_select.get(i);
-					this.selectedTrees.put((String)itm.get("name"),true);
+				// And select the given ones
+				for (int i = 0; i < client_select.length(); i++) {
+					Integer itm = Integer.parseInt((String) client_select.get(i));
+					selected[itm] = true;
 				}
 			} else {
 				arg0.sendResponseHeaders(404, 0);
