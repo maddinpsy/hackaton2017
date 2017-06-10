@@ -35,12 +35,14 @@ public class TreeHandler implements HttpHandler {
 
 		JSONArray result = new JSONArray();
 		for (int i = 0; i < data.length; i++) {
+			La0 += dLa; // calc new La_pos
 			for (int j = 0; j < data[i].length; j++) {
+				Lo0 += dLo; // calc new Lo_pos
 				try {
 					result.put(new JSONArray("[" 
-				         + (La0 + dLa*i) 
-				         + "," 
-				         + (Lo0 + dLo*j) 
+				         + La0 
+				         + ","
+				         + Lo0 
 				         + "," 
 				         + data[i][j] + "]"));
 				} catch (JSONException e) {
