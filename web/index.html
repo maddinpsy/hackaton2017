@@ -30,10 +30,11 @@
 				l.href = href;
 				return l;
 			}
-			//var SERVER_URL="http://localhost:8080";
-			var SERVER_URL="http://"+getLocation(window.location.href).hostname+":8080";
+			var SERVER_URL="http://localhost:8080";
+			//var SERVER_URL="http://"+getLocation(window.location.href).hostname+":8080";
             document.addEventListener('DOMContentLoaded', initMap, false);
             function initMap() {
+				$("#mapid").css("height",(window.innerHeight*0.8)+"px");
                 mymap = L.map('mapid',
 				  {
 				  contextmenu: true,
@@ -75,7 +76,6 @@
 					clearInterval(interval)
 				interval=setInterval(function(){
 					getMarkers(syncMarkers)
-					getAktiveTrees(updateTreeKindListLocal)
 				},1000);
 				
 				
@@ -83,11 +83,7 @@
 				//Add HeatMap
 				var heat;
 				getTreeOverlay(function(data){
-					//heat = L.heatLayer(data, {radius: 25}).addTo(mymap);
-					for(var i=0;i<data.length;i++){
-						var m=L.marker([data[i][0], data[i][1]]).addTo(mymap);
-						m.bindPopup("lat:"+data[i][0] + " lon:" + data[i][1] +"<br>"+ data[i][2]);
-					}
+					heat = L.heatLayer(data, {radius: 25}).addTo(mymap);
 				});
 				
 				
@@ -280,16 +276,6 @@
 				});
 			}
 			
-			function getAktiveTrees(fkt){
-				var url= SERVER_URL + "/treekinds";
-				var re1=$.ajax({ type: 'get', url: url, dataType: "json", crossDomain: true });
-				re1.done(function onSuccess(data){
-					fkt(data);
-				});
-				re1.fail(function onSuccess(data,err){
-					console.log(err);
-				});
-			}
 			
 			function initTreeKindList(data){
 				for(var i=0;i<data.length;i++){
@@ -298,42 +284,15 @@
 				}
 			}
 			
-			function updateTreeKindListLocal(data){
-				$("[id^=chk]").prop("checked",false);
-				for(var i=0;i<data.length;i++){
-					$("#chk"+data[i]).prop("checked",true);
-				}
-			}
-			
-			function updateTreeKindList(){
-				var data=[];
-				$("li").each(function(){
-					if($(this).find("input").prop("checked"))
-						data.push($(this).find("input").attr("id").substr(3));
-				});
-				var url= SERVER_URL + "/treekinds";
-				var re1=$.post({ type: 'post',
-						url: url,
-						data:JSON.stringify(data),
-						dataType: "json",
-						crossDomain: true
-						});
-				re1.done(function onSuccess(data){
-					
-				});
-				re1.fail(function onSuccess(data,err){
-					console.log(err);
-				});
-			}
 			
         </script>
     </head>
     <body>
-        <h1>Hello Map!</h1>
+        <h1>Allergeric Map</h1>
         <div id="mapid" style="height: 480px; width:80%; float: left; margin-right:5px;"></div>
 		Baumarten auswählen
 		<ul id="treeKindSelection">
 		</ul>
-		<input type="button" value="Bestätigen" onclick="updateTreeKindList()" style="float: right;"/>
+		<input type="button" value="Bestätigen" style="float: right;"/>
     </body>
 </html>
