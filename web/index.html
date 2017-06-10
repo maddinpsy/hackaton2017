@@ -87,6 +87,7 @@
 				});
 				re1.fail(function onSuccess(data,err){
 					alert("error:"+err);
+					if(typeof(interval) !== "undefined") clearInterval(interval)
 				});
 			}
 			
