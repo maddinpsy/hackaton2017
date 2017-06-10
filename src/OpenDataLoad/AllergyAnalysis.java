@@ -12,7 +12,8 @@ public class AllergyAnalysis {
 	
 	/**
 	 * Constructor.
-	 * "/users/stud00/mp618/workspace/GitHackathon/res/baeume.csv"
+	 * 
+	 * @param fullFileName full file name to source csv
 	 */
 	public AllergyAnalysis(String fullFileName) {
 		
@@ -71,28 +72,37 @@ public class AllergyAnalysis {
 	 * @return matrix of intensity [nLa][nLo]
 	 */
 	public double[][] analyze(double La0, double Lo0,
-			double La1, double Lo1,
-			int nLa, int nLo,
-			int[] treeGenusIndices) {
-		
-//		data
-//		speciesStrings
-//		genusStrings
-		
-		// 
+			final double La1, final double Lo1,
+			final int nLa, final int nLo,
+			final int[] treeGenusIndices) {
 		
 		// create return data
-		double[][] result = new double[][];
+		double[][] result = new double[nLa][nLo];
+		
+		// calc dLa, dLo
+		double dLa = (La1-La0) / (nLa-1);
+		double dLo = (Lo1-Lo0) / (nLo-1);
 		
 		// iterate la
-		for (int i = 0; i < treeGenusIndices.length; i++) {
-			int j = treeGenusIndices[i];
+		for (int i = 0; i < nLa; i++) {
 			
-		}
+			La0 += dLa; // calc new La_pos
+			
 			// iterate lo
-				// calc intensity for (la, lo) depending on treeGenusIndices
+			for (int j = 0; j < nLo; j++) {
+				
+				Lo0 += dLo; // calc new Lo_pos
+				
+				// iterate data
+				for (int k = 0; k < data.length; k++) {					
+
+					// calc intensity for (la, lo) depending on treeGenusIndices
+					result[i][j] = calcIntensity(La0, Lo0, data[k], treeGenusIndices);					
+				}
+			}
+		}
 		
-		return null;
+		return result;
 	}
 	
 	/**
@@ -135,7 +145,7 @@ public class AllergyAnalysis {
 		return (distance<MAXDISTANCEMETERS) ? (MAXDISTANCEMETERS-distance)/MAXDISTANCEMETERS : 0.0;
 	}
 	
-	// calc mask?
+	// calc mask if too slow?
 	
 	/**
 	 * Checks if an integer is in an array of integer.
@@ -161,7 +171,7 @@ public class AllergyAnalysis {
 	
 	public static void main(String[] args) {
 		
-		String fullFile =  "/users/stud00/mp618/workspace/GitHackathon/res/baeume.csv";
+		String fullFile = "/users/stud00/mp618/workspace/GitHackathon/res/baeume.csv";
 		AllergyAnalysis aa = new AllergyAnalysis(fullFile);
 		
 		// get analysisData
