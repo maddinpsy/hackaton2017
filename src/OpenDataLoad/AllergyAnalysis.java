@@ -82,11 +82,9 @@ public class AllergyAnalysis {
 		double dLa = (La1-La0) / (nLa-1);
 		double dLo = (Lo1-Lo0) / (nLo-1);
 		
-		// test output
-		System.out.println("dLa: " + dLa);
-		System.out.println("dLo: " + dLo);
-		System.out.println("dLa[m]: " + calcDistanceInMeters(La0, Lo0, La0+dLa, Lo0));
-		System.out.println("dLo[m]: " + calcDistanceInMeters(La0, Lo0, La0, Lo0+dLo));
+		// test output: steps in meters
+//		System.out.println("dLa[m]: " + calcDistanceInMeters(La0, Lo0, La0+dLa, Lo0));
+//		System.out.println("dLo[m]: " + calcDistanceInMeters(La0, Lo0, La0, Lo0+dLo));
 		
 		// iterate la
 		for (int i = 0; i < nLa; i++) {
@@ -233,9 +231,5 @@ public class AllergyAnalysis {
 		// check data
 		double max = aa.maxMax(aaData);
 		System.out.println("max: " + max);
-		
-		// breakpoint
-		int x=1;
-		int y=x;
 	}
 }
