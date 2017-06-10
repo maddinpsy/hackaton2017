@@ -44,10 +44,16 @@ public class Test {
 		double Lo0 = 12.0017;
 		double La1 = 54.1861;
 		double Lo1 = 12.2222;
-		int nLa = 20;
-		int nLo = 20;
+		int nLa = 500;
+		int nLo = 500;
 		
-		int[] treeGenusIndices = new int[]{0,1,2,10,20,30,40,50,60,70};
+		int[] treeGenusIndices = new int[]{6, // Eibe
+				8, // Linde
+				10, // Erle
+				32, // Haselnuss
+				45, // Buche
+				55}; // Kiefer
+		
 //		int[] treeGenusIndices = new int[80];
 //		for (int i = 0; i < treeGenusIndices.length; i++) {
 //			treeGenusIndices[i] = i;

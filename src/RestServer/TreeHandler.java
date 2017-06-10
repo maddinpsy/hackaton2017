@@ -63,12 +63,14 @@ public class TreeHandler implements HttpHandler {
 
 	@Override
 	public void handle(HttpExchange arg0) throws IOException {
+		
+		// testdata
 		double La0 = 54.0592;
 		double Lo0 = 12.0017;
-		double La1 = 54.1075;
-		double Lo1 = 12.2157;
-		int nLa = 10;
-		int nLo = 10;
+		double La1 = 54.1861;
+		double Lo1 = 12.2222;
+		int nLa = 500;
+		int nLo = 500;
 		
 		// Always send Header for CrossDomain
 		arg0.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
