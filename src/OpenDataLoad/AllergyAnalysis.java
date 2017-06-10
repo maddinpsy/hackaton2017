@@ -183,7 +183,7 @@ public class AllergyAnalysis {
 	 * 
 	 * @return maxMax
 	 */
-	public double maxMax(double[][] arr) {
+	private double maxMax(double[][] arr) {
 		
 		double max = 0.0;
 		
@@ -194,6 +194,28 @@ public class AllergyAnalysis {
 		}
 		
 		return max;
+	}
+	
+	/**
+	 * Calculates minimum over array.
+	 * 
+	 * @param arr
+	 * 
+	 * @return minMin
+	 */
+	public double[] minMax(double[][] arr) {
+		
+		double miMa[] = new double[2];
+		miMa[0] = maxMax(arr);
+		miMa[1] = miMa[0];
+		
+		for (int i = 0; i < arr.length; i++) {
+			for (int j = 0; j < arr[i].length; j++) {				
+				miMa[0] = miMa[0]>arr[i][j] ? arr[i][j] : miMa[0];
+			}
+		}
+		
+		return miMa;
 	}
 	
 	public static void main(String[] args) {
@@ -229,7 +251,8 @@ public class AllergyAnalysis {
 		double[][] aaData = aa.analyze(La0, Lo0, La1, Lo1, nLa, nLo, treeGenusIndices);
 		
 		// check data
-		double max = aa.maxMax(aaData);
-		System.out.println("max: " + max);
+		double[] miMa = aa.minMax(aaData);
+		System.out.println("min: " + miMa[0]);
+		System.out.println("max: " + miMa[1]);
 	}
 }
