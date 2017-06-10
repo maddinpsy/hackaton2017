@@ -11,6 +11,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.nio.zipfs.JarFileSystemProvider;
 
+import OpenDataLoad.AllergyAnalysis;
 import OpenDataLoad.Dataset;
 
 public class TreeHandler implements HttpHandler {
@@ -34,6 +35,10 @@ public class TreeHandler implements HttpHandler {
 		double dLo = (Lo1 - Lo0) / (nLo - 1);
 		double La0Temp;
 		double Lo0Temp;
+		double tempDla = AllergyAnalysis.calcDistanceInMeters(La0, Lo0, La0+dLa, Lo0);
+		double tempDlo = AllergyAnalysis.calcDistanceInMeters(La0, Lo0, La0, Lo0+dLo);
+		System.out.println("dLa[m]: " + tempDla);
+		System.out.println("dLo[m]: " + tempDlo);
 
 		JSONArray result = new JSONArray();
 		for (int i = 0; i < data.length; i++) {

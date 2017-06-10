@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class AllergyAnalysis {
 	
-	private final double R = 6371.0;				// earth radius km
-	private final double MAXDISTANCEMETERS = 200.0;	// max weighted distance of tree
+//	private final double R = 6371.0;				// earth radius km
+	private final double MAXDISTANCEMETERS = 200000.0;	// max weighted distance of tree
 	private Dataset[] data;						// array of data containers
 	private ArrayList<String> speciesStrings;	// array of strings for species e.g., {"Winter-Linde/Tilia cordata", "Kirsch-Pflaume/Prunus cerasifera"}
 	private ArrayList<String> genusStrings;		// array of strings for genus e.g., {"Linde/Tilia", "Kirsche, Pflaume/Prunus"}
@@ -63,14 +63,14 @@ public class AllergyAnalysis {
 	 * 
 	 * @return distance in meters
 	 */
-	private double calcDistanceInMeters(double La0, double Lo0, double La1, double Lo1) {
+	public static double calcDistanceInMeters(double La0, double Lo0, double La1, double Lo1) {
 
 		double dLat = toRad(La1 - La0);
 		double dLon = toRad(Lo1 - Lo0); 
 		double a = Math.sin(dLat / 2.0) * Math.sin(dLat / 2.0) +
 				Math.cos(toRad(La0)) * Math.cos(toRad(La1)) * 
 				Math.sin(dLon / 2.0) * Math.sin(dLon / 2.0); 
-		return (R * 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a)))*1000;
+		return (6371.0 * 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a)))*1000;
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class AllergyAnalysis {
 	 * 
 	 * @return angle in radians
 	 */
-	private double toRad(double angle) {
+	private static double toRad(double angle) {
 		return angle * Math.PI / 180.0;
 	}
 	
