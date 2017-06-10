@@ -1,6 +1,8 @@
+package RestServer;
 
-
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.json.JSONObject;
@@ -26,14 +28,18 @@ public class MarkerHandler  implements HttpHandler{
 	            os.write(response.getBytes());
 	            os.close();
 			}else if(arg0.getRequestMethod().equals("POST")){
-				JSONObject newObj=new JSONObject(arg0.getRequestBody());
+				InputStream is = arg0.getRequestBody();
+				java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+				JSONObject newObj=new JSONObject(s.next());
 				String response=store.addMarker(newObj);
 				arg0.sendResponseHeaders(200, response.length());
 	            OutputStream os = arg0.getResponseBody();
 	            os.write(response.getBytes());
 	            os.close();
 			}else if(arg0.getRequestMethod().equals("DELETE")){
-				JSONObject newObj=new JSONObject(arg0.getRequestBody());
+				InputStream is = arg0.getRequestBody();
+				java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+				JSONObject newObj=new JSONObject(s.next());
 				String response=store.removeMarker(newObj);
 				arg0.sendResponseHeaders(200, response.length());
 	            OutputStream os = arg0.getResponseBody();
