@@ -42,20 +42,20 @@ public class Test {
 		// testdata
 		double La0 = 54.0592;
 		double Lo0 = 12.0017;
-		double La1 = 54.1075;
-		double Lo1 = 12.2157;
+		double La1 = 54.1861;
+		double Lo1 = 12.2222;
+		int nLa = 20;
+		int nLo = 20;
 		
-		
-		// test input
-		int nLa = 10;
-		int nLo = 10;
-		int[] treeGenusIndices = new int[80];
-		for (int i = 0; i < treeGenusIndices.length; i++) {
-			treeGenusIndices[i] = i;
-		}
+		int[] treeGenusIndices = new int[]{0,1,2,10,20,30,40,50,60,70};
+//		int[] treeGenusIndices = new int[80];
+//		for (int i = 0; i < treeGenusIndices.length; i++) {
+//			treeGenusIndices[i] = i;
+//		}
 		
 		
 		// do analysis
-		return aa.analyze(La0, Lo0, La1, Lo1, nLa, nLo, treeGenusIndices);
+		double data[][] = aa.analyze(La0, Lo0, La1, Lo1, nLa, nLo, treeGenusIndices);
+		return data;
 	}
 }
