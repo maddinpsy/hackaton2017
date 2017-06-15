@@ -9,7 +9,7 @@ import OpenDataLoad.AllergyAnalysis;
 import OpenDataLoad.CsvParser;
 import OpenDataLoad.Dataset;
 
-public class Test {
+public class Server {
 
     public static void main(String[] args) throws Exception {
     	
@@ -27,15 +27,16 @@ public class Test {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         Store store = new Store();
         
+        server.createContext("/", new FileHandler());
 		server.createContext("/markers", new MarkerHandler(store));
-        server.createContext("/trees", new TreeHandler(getAnalysDate()));
+        //server.createContext("/trees", new TreeHandler(getAnalysData()));
         server.createContext("/treekinds", new TreeKindHandler(p.getGenusStrings()));
         
         server.start();
     }
     
     
-    public static double[][] getAnalysDate() {
+    public static double[][] getAnalysData() {
     	String fullFile = "res/baeume.csv";
 		AllergyAnalysis aa = new AllergyAnalysis(fullFile);
 		
